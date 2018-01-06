@@ -1,0 +1,34 @@
+.block-container {
+
+	padding: 0;
+	margin: 0 0 10px;
+
+	.block {
+		display: inline-block;
+		height: 8px;
+		float: left;
+	}
+
+	.block.full {
+		height: 100% !important;
+	}
+}
+
+ul.legend {
+
+	padding: 0;
+
+	li {
+		display: inline-block;
+		list-style-type: none;
+		margin: 0 12px 0 0;
+
+		.blob {
+			display: inline-block;
+			margin: 0 5px 0 0;
+			width: 12px;
+			height: 12px;
+			border-radius: 5px;
+		}
+	}
+}

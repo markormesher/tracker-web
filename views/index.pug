@@ -1,0 +1,62 @@
+doctype html
+html
+	head
+		title Tracker
+		link(rel = 'stylesheet', href = '/_npm/bootstrap/dist/css/bootstrap.min.css')
+		link(rel = 'stylesheet', href = '/_npm/font-awesome/css/font-awesome.min.css')
+		link(rel = 'stylesheet', href = '/global/custom.css')
+		meta(name = 'viewport', content = 'width=device-width, initial-scale=1')
+
+	body.nav-md
+
+		-
+			var lastSyncRaw = entries[entries.length - 1].endTime.toISOString()
+			var lastSync = lastSyncRaw.substr(0, 10) + ' ' + lastSyncRaw.substr(11, 8)
+
+			var percentageBlocks = []
+			for (var title in percentagePerActivity)
+				if (percentagePerActivity.hasOwnProperty(title))
+					percentageBlocks.push([title, percentagePerActivity[title]])
+			percentageBlocks.sort(function(a, b) { return b[1] - a[1] })
+
+		div.container
+
+			div.row: div.col-sm-12
+				h1 Time Tracker
+				p.text-muted Last sync: #{lastSync}
+
+			div.row: div.col-sm-12
+				h3 Legend
+				p.text-muted Click to change the colour assigned to an activity.
+				ul.legend
+					each block in percentageBlocks
+						li
+							div.blob.colourise(data-key = block[0])
+							| #{block[0]}
+
+			div.row: div.col-sm-12
+				h3 Summary
+				div.block-container(style = 'height: 80px')
+					each block in percentageBlocks
+						div.block.full.colourise(data-key = block[0], style = 'width: ' + (block[1] * 100) + '%;')
+
+			div.row: div.col-sm-12
+				h3 Raw Log
+				div.block-container
+					- rowSum = 0
+					- maxRowSum = 24 * 60 * 60
+					each entry in entries
+						- duration = entry.duration
+						while duration > 0
+							- chunkSize = Math.min(duration, maxRowSum - rowSum)
+							- width = (chunkSize / maxRowSum * 100) + '%'
+							div.block.colourise(data-key = entry.title, style = 'width: ' + width)
+
+							- duration -= chunkSize
+							- rowSum += chunkSize
+							- if (rowSum === maxRowSum) rowSum = 0
+
+			script(src = '/_npm/jquery/dist/jquery.min.js')
+			script(src = '/_npm/bootstrap/dist/js/bootstrap.min.js')
+
+			script(src = '/global/bundle.js')
