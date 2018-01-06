@@ -1,12 +1,12 @@
 const colours = [ // some are already assigned below
 	//'#F44336',
 	'#E91E63',
-	'#9C27B0',
+	//'#9C27B0',
 	//'#673AB7',
 	'#3F51B5',
 	'#2196F3',
-	'#03A9F4',
-	//'#00BCD4',
+	//'#03A9F4',
+	'#00BCD4',
 	'#009688',
 	//'#4CAF50',
 	'#8BC34A',
@@ -18,12 +18,13 @@ const colours = [ // some are already assigned below
 ];
 
 const assignedColours: { [key: string]: string } = {
-	'Downtime': '#00BCD4',
-	'Sleeping': '#FFEB3B',
-	'Personal projects': '#4CAF50',
-	'Work': '#F44336',
+	'Downtime': '#FFEB3B',
 	'Exercise': '#673AB7',
-	'Personal development': '#FF9800'
+	'Personal development': '#FF9800',
+	'Personal projects': '#4CAF50',
+	'Sleeping': '#03A9F4',
+	'Travelling': '#9C27B0',
+	'Work': '#F44336',
 };
 
 $(() => {
