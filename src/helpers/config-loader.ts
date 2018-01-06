@@ -1,6 +1,5 @@
 class Constants {
 	port: number;
-	defaultPermissions: string[];
 }
 
 class Secrets {
@@ -10,8 +9,7 @@ class Secrets {
 		password: string,
 		database: string
 	};
-	sessionSecret: string;
-	adminPassword: string;
+	accessKey: string;
 }
 
 const getConstants: (() => Constants) = () => {
