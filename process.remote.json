@@ -5,7 +5,7 @@
 			"cwd": "/var/node/tracker.markormesher.co.uk",
 			"script": "./dist/app.js",
 			"env": {
-				"ENV": "dev"
+				"ENV": "prod"
 			}
 		}
 	]
