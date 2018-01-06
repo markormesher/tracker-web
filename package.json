@@ -1,11 +1,12 @@
 {
   "name": "tracker-web",
   "version": "1.0.0",
-  "description": "",
+  "description": "Web interface for tracker app data",
   "main": "./dist/app.js",
   "scripts": {},
   "author": "Mark Ormesher",
   "license": "Apache-2.0",
+  "repository": "https://github.com/markormesher/tracker-web",
   "dependencies": {
     "body-parser": "^1.18.2",
     "bootstrap": "^3.3.7",
