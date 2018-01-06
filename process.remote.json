@@ -2,7 +2,7 @@
 	"apps": [
 		{
 			"name": "tracker",
-			"cwd": "/var/node/tracker",
+			"cwd": "/var/node/tracker.markormesher.co.uk",
 			"script": "./dist/app.js",
 			"env": {
 				"ENV": "dev"
