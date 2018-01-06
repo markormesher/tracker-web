@@ -49,10 +49,9 @@ html
 					- maxRowSum = 24 * 60 * 60
 					each entry in entries
 						- duration = entry.duration
-						- tooltipSecs = duration % 60
 						- tooltipMins = Math.floor(duration / 60) % 60
 						- tooltipHours = Math.floor(duration / (60 * 60))
-						- tooltipTime = (tooltipHours > 0 ? tooltipHours + 'h ' : '') + (tooltipMins > 0 ? tooltipMins + 'm ' : '') + (tooltipSecs > 0 ? tooltipSecs + 's' : '')
+						- tooltipTime = (tooltipHours > 0 ? tooltipHours + 'h ' : '') + (tooltipMins > 0 ? tooltipMins + 'm ' : '')
 						- tooltip = entry.title + ': ' + tooltipTime
 
 						while duration > 0

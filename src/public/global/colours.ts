@@ -1,38 +1,46 @@
-const colours = [ // some are already assigned below
-	//'#F44336',
-	'#E91E63',
-	//'#9C27B0',
-	//'#673AB7',
+const allColours = [ // for reference
+	'#F44336',
+	'#9C27B0',
 	'#3F51B5',
-	'#2196F3',
-	//'#03A9F4',
-	'#00BCD4',
+	'#03A9F4',
 	'#009688',
-	//'#4CAF50',
 	'#8BC34A',
-	'#CDDC39',
-	//'#FFEB3B',
-	'#FFC107',
-	//'#FF9800',
-	'#FF5722'
+	'#FFEB3B',
+	'#FF9800',
+	'#795548',
+	'#607D8B',
+	'#424242',
+	'#9E9E9E',
+	'#E0E0E0',
 ];
 
 const assignedColours: { [key: string]: string } = {
-	'Downtime': '#FFEB3B',
-	'Exercise': '#673AB7',
-	'Personal development': '#FF9800',
-	'Personal projects': '#4CAF50',
+	'Downtime': '#E0E0E0',
 	'Sleeping': '#03A9F4',
-	'Travelling': '#9C27B0',
+
+	'Exercise': '#9C27B0',
+	'Personal development': '#8BC34A',
+	'Personal projects': '#009688',
+
+	'Commuting': '#3F51B5',
+	'Travelling': '#FF9800',
+	'Work break': '#FFEB3B',
 	'Work': '#F44336',
 };
 
+const spareColours = [
+	'#795548',
+	'#607D8B',
+	'#424242',
+	'#9E9E9E',
+];
+
 $(() => {
-	const randomColours = colours.slice().sort(() => Math.random() - 0.5);
+	spareColours.sort(() => Math.random() - 0.5);
 	$('.colourise').each((i, e) => {
 		const elem = $(e);
 		const key = elem.data('key');
-		const colour = assignedColours[key] || randomColours.pop();
+		const colour = assignedColours[key] || spareColours.pop();
 		assignedColours[key] = colour;
 		elem.css({'background-color': colour})
 	});
