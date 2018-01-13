@@ -44,6 +44,7 @@ div.stat-card {
 	border: 1px solid #c0c0c0;
 	border-radius: 0.5rem;
 	padding: 12px;
+	margin: 0 0 10px;
 
 	div.stat {
 		float: left;
@@ -66,8 +67,8 @@ div.stat-card {
 	}
 }
 
-div.page-header {
-	margin-top: 20px;
+div.container {
+	padding-top: 20px;
 }
 
 div.hr {
