@@ -33,15 +33,13 @@ app.use(NodeSassMiddleware({
 app.use('/', require('./controllers/root'));
 app.use('/data', require('./controllers/data'));
 
-// kill favicon requests
-app.use('/favicon.ico', (req: Request, res: Response) => res.end());
-
 // views
 app.set('views', Path.join(__dirname, '../views'));
 app.set('view engine', 'pug');
 
 // static files
 app.use(Express.static(Path.join(__dirname, 'public')));
+app.use(Express.static(Path.join(__dirname, 'assets')));
 [
 	'bootstrap',
 	'datatables.net',
