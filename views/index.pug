@@ -9,6 +9,11 @@
 		}
 	}
 
+	function round(number, precision) {
+		var factor = Math.pow(10, precision);
+		return Math.round(number * factor) / factor;
+	}
+
 doctype html
 html
 	head
@@ -24,11 +29,6 @@ html
 			var lastSyncRaw = entries[entries.length - 1].endTime.toISOString()
 			var lastSync = lastSyncRaw.substr(0, 10) + ' ' + lastSyncRaw.substr(11, 8)
 
-			var percentageBlocks = []
-			for (var title in percentagePerActivity)
-				if (percentagePerActivity.hasOwnProperty(title))
-					percentageBlocks.push([title, percentagePerActivity[title]])
-			percentageBlocks.sort(function(a, b) { return b[1] - a[1] })
 
 		div.container
 
@@ -36,13 +36,43 @@ html
 				h1 Time Tracker
 				p.text-muted Last sync: #{lastSync}
 
-			div.row: div.col-sm-12
-				h3 Legend
-				ul.legend
-					each block in percentageBlocks
-						li
-							div.blob.colourise(data-key = block[0])
-							| #{block[0]}
+			// insights
+
+			div.row
+
+				- workoutsPerWeek = round(daysWithExercise.length / numDays * 7, 1)
+				- sleepPerNight = round(totalDurationPerActivity['Sleeping'] / (numDays - 1) / 60 / 60, 1) + 'h'
+				- workHoursPerWeek = round(totalDurationPerActivity['Work'] / numDays / 60 / 60 * 7, 1) + 'h'
+				- projectHoursPerWeek = round(totalDurationPerActivity['Personal projects'] / numDays / 60 / 60 * 7, 1) + 'h'
+
+				div.col-sm-12.col-md-3: div.stat-card
+					div.stat: span.colourise(data-key = 'Sleeping')= sleepPerNight
+					div.icon: i.fa.fa-bed.colourise(data-key = 'Sleeping')
+					div.title sleep/night
+
+				div.col-sm-12.col-md-3: div.stat-card
+					div.stat: span.colourise(data-key = 'Exercise')= workoutsPerWeek
+					div.icon: i.fa.fa-heartbeat.colourise(data-key = 'Exercise')
+					div.title workouts/week
+
+				div.col-sm-12.col-md-3: div.stat-card
+					div.stat: span.colourise(data-key = 'Work')= workHoursPerWeek
+					div.icon: i.fa.fa-briefcase.colourise(data-key = 'Work')
+					div.title work/week
+
+				div.col-sm-12.col-md-3: div.stat-card
+					div.stat: span.colourise(data-key = 'Personal projects')= projectHoursPerWeek
+					div.icon: i.fa.fa-wrench.colourise(data-key = 'Personal projects')
+					div.title project work/week
+
+			// summary
+
+			-
+				var percentageBlocks = []
+				for (var title in percentagePerActivity)
+					if (percentagePerActivity.hasOwnProperty(title))
+						percentageBlocks.push([title, percentagePerActivity[title]])
+				percentageBlocks.sort(function(a, b) { return b[1] - a[1] })
 
 			div.row: div.col-sm-12
 				h3 Summary
@@ -51,8 +81,9 @@ html
 						- title = block[0]
 						- percentage = block[1]
 						- width = (percentage * 100) + '%'
-						- tooltip = `${title}: ${Math.round(percentage * 1000) / 10}%<br />`
-						- tooltip += `(${formatDuration(totalPerActivity[title])})`
+						- tooltip = `${title}: ${round(percentage * 100, 1)}%<br />`
+						- tooltip += `(${formatDuration(totalDurationPerActivity[title])})`
+
 						div.block.full.colourise(
 							data-key = title,
 							data-toggle = 'tooltip',
@@ -60,6 +91,13 @@ html
 							title != tooltip,
 							style = 'width: ' + width
 						)
+				ul.legend
+					each block in percentageBlocks
+						li
+							div.blob.colourise(data-key = block[0])
+							| #{block[0]}
+
+			// raw log
 
 			div.row: div.col-sm-12
 				h3 Raw Log
@@ -73,7 +111,14 @@ html
 						while duration > 0
 							- chunkSize = Math.min(duration, maxRowSum - rowSum)
 							- width = (chunkSize / maxRowSum * 100) + '%'
-							div.block.colourise(data-family = entry.id, data-key = entry.title, data-toggle = 'tooltip', title = tooltip, style = 'width: ' + width)
+
+							div.block.colourise(
+								data-family = entry.id,
+								data-key = entry.title,
+								data-toggle = 'tooltip',
+								title = tooltip,
+								style = 'width: ' + width
+							)
 
 							- duration -= chunkSize
 							- rowSum += chunkSize

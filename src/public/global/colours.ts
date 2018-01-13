@@ -42,7 +42,11 @@ $(() => {
 		const key = elem.data('key');
 		const colour = assignedColours[key] || spareColours.pop();
 		assignedColours[key] = colour;
-		elem.css({'background-color': colour})
+		if (elem.prop('tagName') === 'DIV') {
+			elem.css({'background-color': colour})
+		} else {
+			elem.css({'color': colour})
+		}
 	});
 });
 
