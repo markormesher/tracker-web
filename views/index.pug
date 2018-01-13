@@ -1,3 +1,14 @@
+-
+	function formatDuration(duration) {
+		var mins = Math.floor(duration / 60) % 60
+		var hours = Math.floor(duration / (60 * 60))
+		if (hours > 0) {
+			return hours + 'h ' + mins + 'm';
+		} else {
+			return mins + 'm';
+		}
+	}
+
 doctype html
 html
 	head
@@ -27,7 +38,6 @@ html
 
 			div.row: div.col-sm-12
 				h3 Legend
-				// TODO: p.text-muted Click to change the colour assigned to an activity.
 				ul.legend
 					each block in percentageBlocks
 						li
@@ -38,9 +48,18 @@ html
 				h3 Summary
 				div.block-container(style = 'height: 80px')
 					each block in percentageBlocks
-						- width = (block[1] * 100) + '%'
-						- tooltip = block[0] + ': ' + (Math.round(block[1] * 1000) / 10) + '%'
-						div.block.full.colourise(data-key = block[0], data-toggle = 'tooltip', title = tooltip, style = 'width: ' + width)
+						- title = block[0]
+						- percentage = block[1]
+						- width = (percentage * 100) + '%'
+						- tooltip = `${title}: ${Math.round(percentage * 1000) / 10}%<br />`
+						- tooltip += `(${formatDuration(totalPerActivity[title])})`
+						div.block.full.colourise(
+							data-key = title,
+							data-toggle = 'tooltip',
+							data-html = 'true',
+							title != tooltip,
+							style = 'width: ' + width
+						)
 
 			div.row: div.col-sm-12
 				h3 Raw Log
@@ -49,10 +68,7 @@ html
 					- maxRowSum = 24 * 60 * 60
 					each entry in entries
 						- duration = entry.duration
-						- tooltipMins = Math.floor(duration / 60) % 60
-						- tooltipHours = Math.floor(duration / (60 * 60))
-						- tooltipTime = (tooltipHours > 0 ? tooltipHours + 'h ' : '') + (tooltipMins > 0 ? tooltipMins + 'm ' : '')
-						- tooltip = entry.title + ': ' + tooltipTime
+						- tooltip = `${entry.title}: ${formatDuration(entry.duration)}`
 
 						while duration > 0
 							- chunkSize = Math.min(duration, maxRowSum - rowSum)
