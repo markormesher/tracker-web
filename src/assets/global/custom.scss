@@ -1,4 +1,4 @@
-.block-container {
+div.block-container {
 
 	padding: 0;
 	margin: 0 0 10px;
@@ -48,7 +48,7 @@ div.stat-card {
 	div.stat {
 		float: left;
 		font-weight: bold;
-		font-size: 400%;
+		font-size: 350%;
 		line-height: 100%;
 	}
 
@@ -63,5 +63,20 @@ div.stat-card {
 	div.title {
 		clear: both;
 		font-size: 150%;
+	}
+}
+
+div.page-header {
+	margin-top: 20px;
+}
+
+div.hr {
+	height: 1px;
+	width: 100%;
+	margin: 20px 0;
+	background-color: #eeeeee;
+
+	hr {
+		display: none;
 	}
 }

@@ -25,16 +25,10 @@ html
 
 	body.nav-md
 
-		-
-			var lastSyncRaw = entries[entries.length - 1].endTime.toISOString()
-			var lastSync = lastSyncRaw.substr(0, 10) + ' ' + lastSyncRaw.substr(11, 8)
-
-
 		div.container
 
-			div.row: div.col-sm-12
+			div.page-header
 				h1 Time Tracker
-				p.text-muted Last sync: #{lastSync}
 
 			// insights
 
@@ -123,6 +117,16 @@ html
 							- duration -= chunkSize
 							- rowSum += chunkSize
 							- if (rowSum === maxRowSum) rowSum = 0
+
+			// footer
+
+			- sinceLastSync = Math.round(new Date().getTime() / 1000) - entries[entries.length - 1].endTimestamp
+
+			div.hr: hr
+
+			div.row: div.col-sm-12
+				p.text-muted.pull-left Last sync: #{formatDuration(sinceLastSync)} ago
+				p.text-muted.pull-right Data and design &copy; Mark Ormesher #{new Date().getFullYear()}
 
 			script(src = '/_npm/jquery/dist/jquery.min.js')
 			script(src = '/_npm/bootstrap/dist/js/bootstrap.min.js')
