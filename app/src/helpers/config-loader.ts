@@ -1,5 +1,4 @@
 class Constants {
-	port: number;
 }
 
 class Secrets {

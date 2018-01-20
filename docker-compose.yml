@@ -4,11 +4,13 @@ services:
   tracker-web-app:
     build: ./app
     container_name: tracker-web-app
+    environment:
+      - ENV=dev
     ports:
       - "3004:3000"
     depends_on:
       - tracker-web-postgres
-    command: ["./wait-for-it/wait-for-it.sh", "tracker-web-postgres:5432", "--strict", "--", "pm2-runtime", "./process.local.json"]
+    command: ["./wait-for-it/wait-for-it.sh", "tracker-web-postgres:5432", "--strict", "--", "node", "./dist/app.js"]
 
   tracker-web-postgres:
     image: postgres:9.4

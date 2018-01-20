@@ -27,4 +27,8 @@ router.post('/', (req: Request, res: Response, next: NextFunction) => {
 	}).catch(next);
 });
 
+router.get('/env', (req: Request, res: Response, next: NextFunction) => {
+	res.json(process.env);
+});
+
 export = router;

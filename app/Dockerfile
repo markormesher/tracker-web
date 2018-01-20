@@ -2,14 +2,17 @@ FROM node:carbon
 
 WORKDIR /usr/src/app
 
+# dependencies
 COPY package.json ./
-COPY . .
-
-RUN npm i -g pm2 gulp
 RUN npm i
-RUN gulp
 RUN git clone https://github.com/vishnubob/wait-for-it.git
 
-EXPOSE 3000
+# source code
+COPY . .
 
-CMD ["pm2-runtime", "./process.local.json"]
+# compile
+RUN node ./node_modules/gulp/bin/gulp.js
+
+# run
+EXPOSE 3000
+CMD ["node", "./dist/app.js"]
