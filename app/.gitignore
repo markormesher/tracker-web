@@ -1,5 +1,4 @@
-# Ignore CSS (commit the SCSS instead)
-*.css
+node_modules/
 
 dist/
 

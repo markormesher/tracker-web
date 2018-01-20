@@ -5,7 +5,7 @@ services:
     build: ./app
     container_name: tracker-web-app
     ports:
-     - "3000:3000"
+     - "3004:3000"
     depends_on:
       - tracker-web-postgres
     command: ["./wait-for-it/wait-for-it.sh", "tracker-web-postgres:5432", "--strict", "--", "pm2-runtime", "./process.local.json"]
