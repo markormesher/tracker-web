@@ -1,16 +1,6 @@
-### Project-specific ###
+tracker-web-postgres-data
 
-# Ignore CSS (commit the SCSS instead)
-*.css
-
-# Ignore compiled files
-dist/
-
-# Protect secrets
-secrets.*
-!secrets.example.json
-
-### Below: created by https://www.gitignore.io/api/intellij,node,linux,windows ###
+### Created by https://www.gitignore.io/api/intellij,node,linux,windows ###
 
 ### Intellij ###
 

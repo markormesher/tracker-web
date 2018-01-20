@@ -5,10 +5,10 @@ import ConfigLoader = require('./config-loader');
 const secrets = ConfigLoader.getSecrets();
 
 const sequelize = new Sequelize({
-	host: secrets.postgres.host,
-	username: secrets.postgres.username,
-	password: secrets.postgres.password,
-	database: secrets.postgres.database,
+	host: 'tracker-web-postgres',
+	username: 'postgres',
+	password: null,
+	database: 'postgres',
 	dialect: 'postgres',
 	pool: {
 		max: 5,
@@ -18,11 +18,6 @@ const sequelize = new Sequelize({
 	},
 	operatorsAliases: false,
 	modelPaths: [Path.join(__dirname, '../models')],
-	define: {
-		//timestamps: true,
-		//paranoid: true,
-		//version: true
-	},
 	logging: () => {}
 });
 
