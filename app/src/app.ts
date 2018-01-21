@@ -7,8 +7,6 @@ import ConfigLoader = require('./helpers/config-loader');
 import SequelizeDb = require('./helpers/db');
 import {StatusError} from './helpers/StatusError';
 
-const constants = ConfigLoader.getConstants();
-
 const app = Express();
 
 // db connection
@@ -75,4 +73,4 @@ app.use((error: StatusError, req: Request, res: Response, next: NextFunction) =>
 });
 
 // go!
-app.listen(constants.port, () => console.log(`Listening on port ${constants.port}`));
+app.listen(3000, () => console.log('Listening on port 3000'));
