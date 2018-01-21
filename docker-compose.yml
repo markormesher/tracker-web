@@ -5,6 +5,7 @@ services:
     build: ./app
     depends_on:
       - postgres
+    restart: always
     secrets:
       - api.key
       - postgres.password
@@ -16,6 +17,7 @@ services:
 
   postgres:
     image: postgres:10.1-alpine
+    restart: always
     secrets:
       - postgres.password
     environment:
