@@ -9,7 +9,7 @@ services:
       - ENV=dev
     ports:
       - "3004:3000"
-    command: ["./wait-for-it/wait-for-it.sh", "postgres:5432", "--strict", "--", "node", "./dist/app.js"]
+    command: ["./wait-for-it/wait-for-it.sh", "postgres:5432", "--timeout=30", "--strict", "--", "node", "./dist/app.js"]
 
   postgres:
     image: postgres:9.4
