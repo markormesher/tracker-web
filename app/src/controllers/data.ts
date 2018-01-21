@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response, Router} from 'express';
 
 import {LogEntry} from '../models/LogEntry';
-import {getSecrets} from "../helpers/config-loader";
+import {getSecret} from "../helpers/config-loader";
 
 const router = Router();
 
@@ -12,8 +12,7 @@ router.get('/', (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.post('/', (req: Request, res: Response, next: NextFunction) => {
-	const config = getSecrets();
-	if (req.header("Authorization") !== `Bearer ${config.accessKey}`) {
+	if (req.header("Authorization") !== `Bearer ${getSecret('api.key')}`) {
 		res.status(403).end();
 		return
 	}

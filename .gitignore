@@ -1,3 +1,6 @@
+secrets/
+!secrets/.gitignore
+
 # IntelliJ
 *.iml
 .idea/

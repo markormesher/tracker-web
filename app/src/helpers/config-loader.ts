@@ -1,30 +1,14 @@
-class Constants {
-}
+import * as fs from 'fs';
 
-class Secrets {
-	postgres: {
-		host: string,
-		username: string,
-		password: string,
-		database: string
-	};
-	accessKey: string;
-}
+const loadedSecrets: { [key: string]: string } = {};
 
-const getConstants: (() => Constants) = () => {
-	if (process.env.ENV === 'dev') {
-		return require('../../constants.dev.json');
-	} else {
-		return require('../../constants.prod.json');
+const getSecret: ((key: string) => string) = (key) => {
+	if (loadedSecrets[key] === undefined) {
+		console.log(`Secret from disk: ${key}`);
+		loadedSecrets[key] = fs.readFileSync(`/run/secrets/${key}`).toString().trim();
 	}
+	console.log(`Secret from cache: ${key}`);
+	return loadedSecrets[key];
 };
 
-const getSecrets: (() => Secrets) = () => {
-	if (process.env.ENV === 'dev') {
-		return require('../../secrets.dev.json');
-	} else {
-		return require('../../secrets.prod.json');
-	}
-};
-
-export {getConstants, getSecrets};
+export {getSecret};

@@ -2,12 +2,10 @@ import {Sequelize} from 'sequelize-typescript';
 import Path = require('path');
 import ConfigLoader = require('./config-loader');
 
-const secrets = ConfigLoader.getSecrets();
-
 const sequelize = new Sequelize({
 	host: 'postgres',
 	username: 'postgres',
-	password: null,
+	password: ConfigLoader.getSecret('postgres.password'),
 	database: 'postgres',
 	dialect: 'postgres',
 	pool: {

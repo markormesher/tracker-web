@@ -5,6 +5,9 @@ services:
     build: ./app
     depends_on:
       - postgres
+    secrets:
+      - api.key
+      - postgres.password
     environment:
       - ENV=dev
     ports:
@@ -13,8 +16,18 @@ services:
 
   postgres:
     image: postgres:10.1-alpine
+    secrets:
+      - postgres.password
+    environment:
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres.password
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
 volumes:
   postgres-data:
+
+secrets:
+  api.key:
+    file: ./secrets/api.key
+  postgres.password:
+    file: ./secrets/postgres.password
