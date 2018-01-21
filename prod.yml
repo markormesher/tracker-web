@@ -1,6 +1,6 @@
 version: '3.3'
 
 services:
-  tracker-web-app:
+  app:
     environment:
       - ENV=prod

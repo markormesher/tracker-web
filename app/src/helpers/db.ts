@@ -5,7 +5,7 @@ import ConfigLoader = require('./config-loader');
 const secrets = ConfigLoader.getSecrets();
 
 const sequelize = new Sequelize({
-	host: 'tracker-web-postgres',
+	host: 'postgres',
 	username: 'postgres',
 	password: null,
 	database: 'postgres',
