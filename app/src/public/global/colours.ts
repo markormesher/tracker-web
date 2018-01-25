@@ -23,8 +23,8 @@ const assignedColours: { [key: string]: string } = {
 	'Personal projects': '#009688',
 
 	'Commuting': '#3F51B5',
-	'Travelling': '#FF9800',
 	'Work break': '#FFEB3B',
+	'Work travel': '#FF9800',
 	'Work': '#F44336',
 };
 
