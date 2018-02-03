@@ -9,4 +9,4 @@ waitForRedis=$!
 wait ${waitForPostgres}
 wait ${waitForRedis}
 
-node ./dist/app.js
+exec node ./dist/app.js

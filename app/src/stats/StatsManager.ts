@@ -1,6 +1,6 @@
 import _ = require("lodash");
 import Bluebird = require("bluebird");
-import redis = require('../helpers/redis');
+import RedisHelper = require('../helpers/redis');
 import {LogEntry} from "../models/LogEntry";
 
 export class Stats {
@@ -77,7 +77,7 @@ function recomputeStats(): Bluebird<'OK'> {
 				} as Stats;
 			})
 			.then(results => {
-				const client = redis.getClient();
+				const client = RedisHelper.getClient();
 				return client
 						.setAsync('stats.blob', JSON.stringify(results))
 						.then(() => client.quitAsync());
@@ -85,7 +85,7 @@ function recomputeStats(): Bluebird<'OK'> {
 }
 
 function getStats(): Bluebird<Stats> {
-	const client = redis.getClient();
+	const client = RedisHelper.getClient();
 	return client.getAsync('stats.blob')
 			.then((value: string) => {
 				if (!value) {
