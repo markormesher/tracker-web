@@ -3,7 +3,6 @@ import BodyParser = require('body-parser');
 import Express  = require('express');
 import {Request, Response, NextFunction} from 'express';
 import NodeSassMiddleware = require('node-sass-middleware');
-import ConfigLoader = require('./helpers/config-loader');
 import SequelizeDb = require('./helpers/db');
 import {StatusError} from './helpers/StatusError';
 
@@ -73,4 +72,5 @@ app.use((error: StatusError, req: Request, res: Response, next: NextFunction) =>
 });
 
 // go!
-app.listen(3000, () => console.log('Listening on port 3000'));
+const server = app.listen(3000, () => console.log('Listening on port 3000'));
+process.on('SIGTERM', () => server.close(() => process.exit(0)));
