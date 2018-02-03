@@ -84,18 +84,21 @@ function recomputeStats(): Bluebird<'OK'> {
 			});
 }
 
-function getStats(): Bluebird<Stats> {
+function getStats(secondAttempt: boolean = false): Bluebird<Stats> {
 	const client = RedisHelper.getClient();
 	return client.getAsync('stats.blob')
 			.then((value: string) => {
 				if (!value) {
-					throw new Error('Stats are not computed!');
+					if (secondAttempt) {
+						throw new Error('Stats could not be computed!');
+					} else {
+						return recomputeStats().then(() => getStats(true));
+					}
 				} else {
-					return value;
+					return JSON.parse(value) as Stats;
 				}
 			})
-			.then((value: string) => client.quitAsync().then(() => value))
-			.then((value: string) => JSON.parse(value) as Stats)
+			.then((value: Stats) => client.quitAsync().then(() => value));
 }
 
 export {
