@@ -60,10 +60,6 @@ function recomputeStats(): Bluebird<'OK'> {
 			.then(entries => {
 				entries.forEach(e => e.populatePeriods());
 
-				for (let i = 0; i < 20; ++i) {
-					console.log(entries[i].periods);
-				}
-
 				const totalDuration = computeTotalDuration(entries);
 				const totalDurationPerActivity = computeTotalDurationPerActivity(entries);
 				const percentagePerActivity = computePercentagePerActivity(totalDurationPerActivity, totalDuration);
