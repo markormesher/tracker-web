@@ -27,7 +27,7 @@ router.get('/', (req: Request, res: Response, next: NextFunction) => {
 					totalDurationPerActivity: stats.totalDurationPerActivity,
 					percentagePerActivity: stats.percentagePerActivity,
 					countAllDays: stats.countAllDays,
-					countDaysWithExercise: stats.countDaysWithExercise,
+					daysWithActivity: stats.daysWithActivity,
 				});
 			})
 			.catch(next);

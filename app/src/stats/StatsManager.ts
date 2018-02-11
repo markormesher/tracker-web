@@ -8,7 +8,7 @@ export class Stats {
 	totalDurationPerActivity: { [key: string]: number };
 	percentagePerActivity: { [key: string]: number };
 	countAllDays: number;
-	countDaysWithExercise: number;
+	daysWithActivity: { [key: string]: string[] };
 }
 
 function computeTotalDuration(entries: LogEntry[]): number {
@@ -45,13 +45,18 @@ function computeCountAllDays(totalDuration: number) {
 	return Math.ceil(totalDuration / (24 * 60 * 60 * 1000));
 }
 
-function computeCountDaysWithActivity(entries: LogEntry[], activity: string): number {
+function computeDaysWithActivity(entries: LogEntry[]): { [key: string]: string[] }  {
 	return _(entries)
-			.filter(e => e.title === activity)
-			.map(e => e.periods[0].start.toISOString().substr(0, 10))
-			.uniq()
-			.value()
-			.length;
+			.groupBy(e => e.title)
+			.map((groupedEntries, key) => {
+				const objFragment: { [key: string]: string[] } = {};
+				objFragment[key] = _(groupedEntries)
+						.flatMap(e => _.flatMap(e.periods, p => p.start.format('YYYY-MM-DD')))
+						.uniq()
+						.value();
+				return objFragment;
+			})
+			.reduce(_.merge);
 }
 
 function recomputeStats(): Bluebird<'OK'> {
@@ -64,14 +69,14 @@ function recomputeStats(): Bluebird<'OK'> {
 				const totalDurationPerActivity = computeTotalDurationPerActivity(entries);
 				const percentagePerActivity = computePercentagePerActivity(totalDurationPerActivity, totalDuration);
 				const countAllDays = computeCountAllDays(totalDuration);
-				const countDaysWithExercise = computeCountDaysWithActivity(entries, 'Exercise');
+				const daysWithActivity = computeDaysWithActivity(entries);
 
 				return {
 					totalDuration: totalDuration,
 					totalDurationPerActivity: totalDurationPerActivity,
 					percentagePerActivity: percentagePerActivity,
 					countAllDays: countAllDays,
-					countDaysWithExercise: countDaysWithExercise,
+					daysWithActivity: daysWithActivity,
 				} as Stats;
 			})
 			.then(results => {
