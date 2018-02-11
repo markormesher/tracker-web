@@ -1,5 +1,6 @@
 -
 	function formatDuration(duration) {
+		duration = duration / 1000;
 		var mins = Math.floor(duration / 60) % 60
 		var hours = Math.floor(duration / (60 * 60))
 		if (hours > 0) {
@@ -34,9 +35,9 @@ html
 			div.row
 
 				- workoutsPerWeek = round(countDaysWithExercise / countAllDays * 7, 1)
-				- sleepPerNight = round(totalDurationPerActivity['Sleeping'] / (countAllDays - 1) / 60 / 60, 1) + 'h'
-				- workHoursPerWeek = round(totalDurationPerActivity['Work'] / countAllDays / 60 / 60 * 7, 1) + 'h'
-				- projectHoursPerWeek = round(totalDurationPerActivity['Personal projects'] / countAllDays / 60 / 60 * 7, 1) + 'h'
+				- sleepPerNight = formatDuration(totalDurationPerActivity['Sleeping'] / (countAllDays - 1))
+				- workHoursPerWeek = formatDuration(totalDurationPerActivity['Work'] / countAllDays * 7)
+				- projectHoursPerWeek = formatDuration(totalDurationPerActivity['Personal projects'] / countAllDays * 7)
 
 				div.col-sm-12.col-md-3: div.stat-card
 					div.stat: span.colourise(data-key = 'Sleeping')= sleepPerNight
@@ -96,10 +97,14 @@ html
 				h3 Raw Log
 				div.block-container
 					- rowSum = 0
-					- maxRowSum = 24 * 60 * 60
+					- maxRowSum = 24 * 60 * 60 * 1000
 					each entry in entries
-						- duration = entry.duration
-						- tooltip = `${entry.title}: ${formatDuration(entry.duration)}`
+						-
+							duration = 0
+							for (let i = 0; i < entry.periods.length; ++i) {
+								duration += entry.periods[i].getDuration();
+							}
+							tooltip = `${entry.title}: ${formatDuration(duration)}`
 
 						while duration > 0
 							- chunkSize = Math.min(duration, maxRowSum - rowSum)
@@ -119,12 +124,19 @@ html
 
 			// footer
 
-			- sinceLastSync = Math.round(new Date().getTime() / 1000) - entries[entries.length - 1].endTimestamp
+			-
+				var lastSync = 'never';
+				if (entries && entries.length > 0) {
+					const lastEntry = entries[entries.length - 1]
+					const lastPeriod = lastEntry.periods[lastEntry.periods.length - 1]
+					const lastEntryEnd = lastPeriod.end.valueOf()
+					lastSync = formatDuration(new Date().getTime() - lastEntryEnd) + ' ago'
+				}
 
 			div.hr: hr
 
 			div.row: div.col-sm-12
-				p.text-muted.pull-left Last sync: #{formatDuration(sinceLastSync)} ago
+				p.text-muted.pull-left Last sync: #{lastSync}
 				p.text-muted.pull-right Data and design &copy; Mark Ormesher #{new Date().getFullYear()}
 
 			script(src = '/_npm/jquery/dist/jquery.min.js')

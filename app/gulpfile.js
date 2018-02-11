@@ -13,6 +13,8 @@ const source = require('vinyl-source-stream');
 
 const staticAssetsInput = 'src/assets/**/*';
 const staticAssetsOutput = 'dist/assets';
+const staticViewsInput = 'src/views/**/*';
+const staticViewsOutput = 'dist/views';
 const tsAssets = 'dist/public';
 const tsConfig = 'tsconfig.json';
 const distOutput = 'dist';
@@ -39,6 +41,10 @@ gulp.task('static-assets', ['compile-ts'], function () {
 	return gulp.src(staticAssetsInput).pipe(gulp.dest(staticAssetsOutput));
 });
 
+gulp.task('static-views', ['compile-ts'], function () {
+	return gulp.src(staticViewsInput).pipe(gulp.dest(staticViewsOutput));
+});
+
 gulp.task('ts-assets', ['compile-ts'], function () {
 	const folders = getFolders(tsAssets);
 
@@ -60,4 +66,4 @@ gulp.task('ts-assets', ['compile-ts'], function () {
 	});
 });
 
-gulp.task('default', ['clean', 'compile-ts', 'static-assets', 'ts-assets']);
+gulp.task('default', ['clean', 'compile-ts', 'static-assets', 'static-views', 'ts-assets']);

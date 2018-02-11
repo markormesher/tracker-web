@@ -31,7 +31,7 @@ app.use('/', require('./controllers/root'));
 app.use('/data', require('./controllers/data'));
 
 // views
-app.set('views', Path.join(__dirname, '../views'));
+app.set('views', Path.join(__dirname, './views'));
 app.set('view engine', 'pug');
 
 // static files

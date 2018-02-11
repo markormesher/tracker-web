@@ -14,10 +14,13 @@ export class Stats {
 function computeTotalDuration(entries: LogEntry[]): number {
 	if (entries.length == 0) {
 		return 0;
-	} else if (entries.length == 1) {
-		return entries[0].duration;
 	} else {
-		return entries[entries.length - 1].endTimestamp - entries[0].startTimestamp;
+		const firstEntry = entries[0];
+		const lastEntry = entries[entries.length - 1];
+		const firstPeriod = firstEntry.periods[0];
+		const lastPeriod = lastEntry.periods[lastEntry.periods.length - 1];
+
+		return lastPeriod.end.valueOf() - firstPeriod.start.valueOf();
 	}
 }
 
@@ -26,7 +29,7 @@ function computeTotalDurationPerActivity(entries: LogEntry[]): { [key: string]: 
 			.groupBy(e => e.title)
 			.map((groupedEntries, key) => {
 				const objFragment: { [key: string]: number } = {};
-				objFragment[key] = _.sumBy(groupedEntries, e => e.duration);
+				objFragment[key] = _.sumBy(groupedEntries, e => _.sumBy(e.periods, p => p.getDuration()));
 				return objFragment;
 			})
 			.reduce(_.merge);
@@ -39,13 +42,13 @@ function computePercentagePerActivity(totalDurationPerActivity: { [key: string]:
 }
 
 function computeCountAllDays(totalDuration: number) {
-	return Math.ceil(totalDuration / (24 * 60 * 60));
+	return Math.ceil(totalDuration / (24 * 60 * 60 * 1000));
 }
 
 function computeCountDaysWithActivity(entries: LogEntry[], activity: string): number {
 	return _(entries)
 			.filter(e => e.title === activity)
-			.map(e => e.startTime.toISOString().substr(0, 10))
+			.map(e => e.periods[0].start.toISOString().substr(0, 10))
 			.uniq()
 			.value()
 			.length;
@@ -55,12 +58,11 @@ function recomputeStats(): Bluebird<'OK'> {
 	return LogEntry
 			.findAll({order: [['startTime', 'ASC']]})
 			.then(entries => {
-				entries.forEach((entry, i) => {
-					entry.startTimestamp = Math.floor(entry.startTime.getTime() / 1000);
-					entry.endTimestamp = Math.floor(entry.endTime.getTime() / 1000);
-					entry.duration = entry.endTimestamp - entry.startTimestamp;
-					entries[i] = entry;
-				});
+				entries.forEach(e => e.populatePeriods());
+
+				for (let i = 0; i < 20; ++i) {
+					console.log(entries[i].periods);
+				}
 
 				const totalDuration = computeTotalDuration(entries);
 				const totalDurationPerActivity = computeTotalDurationPerActivity(entries);

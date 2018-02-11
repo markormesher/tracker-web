@@ -12,6 +12,8 @@ services:
       - postgres.password
     environment:
       - ENV=dev
+    volumes:
+      - ./app/src/views:/usr/src/app/dist/views
     ports:
       - "3004:3000"
     command: ["./entry-point.sh"]

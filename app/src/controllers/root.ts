@@ -16,11 +16,9 @@ router.get('/', (req: Request, res: Response, next: NextFunction) => {
 				const entries = results[0];
 				const stats = results[1];
 
-				entries.forEach((entry, i) => {
-					entry.startTimestamp = Math.floor(entry.startTime.getTime() / 1000);
-					entry.endTimestamp = Math.floor(entry.endTime.getTime() / 1000);
-					entry.duration = entry.endTimestamp - entry.startTimestamp;
-					entries[i] = entry;
+				entries.forEach((e, i) => {
+					e.populatePeriods();
+					entries[i] = e;
 				});
 
 				res.render('index', {
