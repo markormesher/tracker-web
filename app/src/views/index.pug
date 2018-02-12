@@ -1,4 +1,11 @@
 -
+	const totalDuration = stats.totalDuration || 0;
+	const totalDurationPerActivity = stats.totalDurationPerActivity || {};
+	const totalDurationPerActivityPerDay = stats.totalDurationPerActivityPerDay || {};
+	const percentageDurationPerActivity = stats.percentageDurationPerActivity || {};
+	const countDays = stats.countDays || 0;
+	const countDaysPerActivity = stats.countDaysPerActivity || {};
+
 	function formatDuration(duration) {
 		duration = duration / 1000;
 		var mins = Math.floor(duration / 60) % 60
@@ -30,14 +37,16 @@ html
 
 		div.container
 
+			div.row: div.col-md-12: pre= JSON.stringify(countDaysPerActivity, null, 2)
+
 			// insights
 
 			div.row
 
-				- const workoutsPerWeek = round(daysWithActivity['Exercise'].length / totalDays * 7, 1)
-				- const sleepPerNight = formatDuration(totalDurationPerActivity['Sleeping'] / (totalDays - 1))
-				- const workHoursPerWeek = formatDuration(totalDurationPerActivity['Work'] / totalDays * 7)
-				- const projectHoursPerWeek = formatDuration(totalDurationPerActivity['Personal projects'] / totalDays * 7)
+				- const sleepPerNight = formatDuration(totalDurationPerActivity['Sleeping'] / (countDays - 1))
+				- const workoutsPerWeek = round(countDaysPerActivity['Exercise'] / countDays * 7, 1)
+				- const workHoursPerWeek = formatDuration(totalDurationPerActivity['Work'] / countDays * 7)
+				- const projectHoursPerWeek = formatDuration(totalDurationPerActivity['Personal projects'] / countDays * 7)
 
 				div.col-sm-12.col-md-3: div.stat-card
 					div.stat: span.colourise(data-key = 'Sleeping')= sleepPerNight

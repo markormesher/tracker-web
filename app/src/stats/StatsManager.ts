@@ -1,14 +1,15 @@
 import _ = require("lodash");
 import Bluebird = require("bluebird");
 import RedisHelper = require('../helpers/redis');
-import {LogEntry} from "../models/LogEntry";
+import {LogEntry, Period} from "../models/LogEntry";
 
 export class Stats {
 	totalDuration: number;
-	totalDays: number;
 	totalDurationPerActivity: { [key: string]: number };
+	totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } };
 	percentageDurationPerActivity: { [key: string]: number };
-	daysWithActivity: { [key: string]: string[] };
+	countDays: number;
+	countDaysPerActivity: { [key: string]: number }
 }
 
 function computeTotalDuration(entries: LogEntry[]): number {
@@ -24,16 +25,36 @@ function computeTotalDuration(entries: LogEntry[]): number {
 	}
 }
 
-function computeTotalDays(totalDuration: number) {
+function computeCountDays(totalDuration: number) {
 	return Math.ceil(totalDuration / (24 * 60 * 60 * 1000));
 }
 
 function computeTotalDurationPerActivity(entries: LogEntry[]): { [key: string]: number } {
 	return _(entries)
 			.groupBy(e => e.title)
-			.map((groupedEntries, key) => {
+			.map((groupedEntries: LogEntry[], entryKey: string) => {
 				const objFragment: { [key: string]: number } = {};
-				objFragment[key] = _.sumBy(groupedEntries, e => _.sumBy(e.periods, p => p.getDuration()));
+				objFragment[entryKey] = _.sumBy(groupedEntries, e => _.sumBy(e.periods, p => p.getDuration()));
+				return objFragment;
+			})
+			.reduce(_.merge);
+}
+
+function computeTotalDurationPerActivityPerDay(entries: LogEntry[]): { [key: string]: { [key: string]: number } } {
+	return _(entries)
+			.groupBy(e => e.title)
+			.map((groupedEntries: LogEntry[], entryKey: string) => {
+				const objFragment: { [key: string]: { [key: string]: number } } = {};
+				objFragment[entryKey] = _(groupedEntries)
+						.flatMap((e: LogEntry) => e.periods)
+						.flatten()
+						.groupBy((p: Period) => p.start.format("YYYY-MM-DD"))
+						.map((groupedPeriods: Period[], periodKey: string) => {
+							const innerObjFragment: { [key: string]: number } = {};
+							innerObjFragment[periodKey] = _.sumBy(groupedPeriods, p => p.getDuration());
+							return innerObjFragment;
+						})
+						.reduce(_.merge);
 				return objFragment;
 			})
 			.reduce(_.merge);
@@ -45,18 +66,12 @@ function computePercentageDurationPerActivity(totalDurationPerActivity: { [key: 
 			.value();
 }
 
-function computeDaysWithActivity(entries: LogEntry[]): { [key: string]: string[] }  {
-	return _(entries)
-			.groupBy(e => e.title)
-			.map((groupedEntries, key) => {
-				const objFragment: { [key: string]: string[] } = {};
-				objFragment[key] = _(groupedEntries)
-						.flatMap(e => _.flatMap(e.periods, p => p.start.format('YYYY-MM-DD')))
-						.uniq()
-						.value();
-				return objFragment;
+function computeCountDaysPerActivity(totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } }): { [key: string]: number } {
+	return _(totalDurationPerActivityPerDay)
+			.mapValues((totalsPerDay: { [key: string]: number }) => {
+				return _.keys(totalsPerDay).length;
 			})
-			.reduce(_.merge);
+			.value();
 }
 
 function recomputeStats(): Bluebird<'OK'> {
@@ -66,17 +81,19 @@ function recomputeStats(): Bluebird<'OK'> {
 				entries.forEach(e => e.populatePeriods());
 
 				const totalDuration = computeTotalDuration(entries);
-				const totalDays = computeTotalDays(totalDuration);
 				const totalDurationPerActivity = computeTotalDurationPerActivity(entries);
+				const totalDurationPerActivityPerDay = computeTotalDurationPerActivityPerDay(entries);
 				const percentageDurationPerActivity = computePercentageDurationPerActivity(totalDurationPerActivity, totalDuration);
-				const daysWithActivity = computeDaysWithActivity(entries);
+				const countDays = computeCountDays(totalDuration);
+				const countDaysPerActivity = computeCountDaysPerActivity(totalDurationPerActivityPerDay);
 
 				return {
 					totalDuration: totalDuration,
 					totalDurationPerActivity: totalDurationPerActivity,
+					totalDurationPerActivityPerDay: totalDurationPerActivityPerDay,
 					percentageDurationPerActivity: percentageDurationPerActivity,
-					totalDays: totalDays,
-					daysWithActivity: daysWithActivity,
+					countDays: countDays,
+					countDaysPerActivity: countDaysPerActivity,
 				} as Stats;
 			})
 			.then(results => {

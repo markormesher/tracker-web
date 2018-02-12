@@ -16,18 +16,11 @@ router.get('/', (req: Request, res: Response, next: NextFunction) => {
 				const entries = results[0];
 				const stats = results[1];
 
-				entries.forEach((e, i) => {
-					e.populatePeriods();
-					entries[i] = e;
-				});
+				entries.forEach(e => e.populatePeriods());
 
 				res.render('index', {
 					entries: entries,
-					totalDuration: stats.totalDuration,
-					totalDays: stats.totalDays,
-					totalDurationPerActivity: stats.totalDurationPerActivity,
-					percentageDurationPerActivity: stats.percentageDurationPerActivity,
-					daysWithActivity: stats.daysWithActivity,
+					stats: stats
 				});
 			})
 			.catch(next);
