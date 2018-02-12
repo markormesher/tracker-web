@@ -24,9 +24,9 @@ router.get('/', (req: Request, res: Response, next: NextFunction) => {
 				res.render('index', {
 					entries: entries,
 					totalDuration: stats.totalDuration,
+					totalDays: stats.totalDays,
 					totalDurationPerActivity: stats.totalDurationPerActivity,
-					percentagePerActivity: stats.percentagePerActivity,
-					countAllDays: stats.countAllDays,
+					percentageDurationPerActivity: stats.percentageDurationPerActivity,
 					daysWithActivity: stats.daysWithActivity,
 				});
 			})

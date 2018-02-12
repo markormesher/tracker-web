@@ -5,9 +5,9 @@ import {LogEntry} from "../models/LogEntry";
 
 export class Stats {
 	totalDuration: number;
+	totalDays: number;
 	totalDurationPerActivity: { [key: string]: number };
-	percentagePerActivity: { [key: string]: number };
-	countAllDays: number;
+	percentageDurationPerActivity: { [key: string]: number };
 	daysWithActivity: { [key: string]: string[] };
 }
 
@@ -24,6 +24,10 @@ function computeTotalDuration(entries: LogEntry[]): number {
 	}
 }
 
+function computeTotalDays(totalDuration: number) {
+	return Math.ceil(totalDuration / (24 * 60 * 60 * 1000));
+}
+
 function computeTotalDurationPerActivity(entries: LogEntry[]): { [key: string]: number } {
 	return _(entries)
 			.groupBy(e => e.title)
@@ -35,14 +39,10 @@ function computeTotalDurationPerActivity(entries: LogEntry[]): { [key: string]: 
 			.reduce(_.merge);
 }
 
-function computePercentagePerActivity(totalDurationPerActivity: { [key: string]: number }, totalDuration: number): { [key: string]: number } {
+function computePercentageDurationPerActivity(totalDurationPerActivity: { [key: string]: number }, totalDuration: number): { [key: string]: number } {
 	return _(totalDurationPerActivity)
 			.mapValues(val => val / totalDuration)
 			.value();
-}
-
-function computeCountAllDays(totalDuration: number) {
-	return Math.ceil(totalDuration / (24 * 60 * 60 * 1000));
 }
 
 function computeDaysWithActivity(entries: LogEntry[]): { [key: string]: string[] }  {
@@ -66,16 +66,16 @@ function recomputeStats(): Bluebird<'OK'> {
 				entries.forEach(e => e.populatePeriods());
 
 				const totalDuration = computeTotalDuration(entries);
+				const totalDays = computeTotalDays(totalDuration);
 				const totalDurationPerActivity = computeTotalDurationPerActivity(entries);
-				const percentagePerActivity = computePercentagePerActivity(totalDurationPerActivity, totalDuration);
-				const countAllDays = computeCountAllDays(totalDuration);
+				const percentageDurationPerActivity = computePercentageDurationPerActivity(totalDurationPerActivity, totalDuration);
 				const daysWithActivity = computeDaysWithActivity(entries);
 
 				return {
 					totalDuration: totalDuration,
 					totalDurationPerActivity: totalDurationPerActivity,
-					percentagePerActivity: percentagePerActivity,
-					countAllDays: countAllDays,
+					percentageDurationPerActivity: percentageDurationPerActivity,
+					totalDays: totalDays,
 					daysWithActivity: daysWithActivity,
 				} as Stats;
 			})
