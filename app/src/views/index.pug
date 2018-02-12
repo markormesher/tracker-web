@@ -100,6 +100,15 @@ html
 							div.blob.colourise(data-key = block[0])
 							| #{block[0]}
 
+			// 1/7-day averages
+
+			div.row: div.col-sm-12
+				h3 1/7-Day Averages
+
+			div.row
+				div.col-sm-12.col-md-6: canvas#sleepGraph(style= 'height: 180px;')
+				div.col-sm-12.col-md-6: canvas#workGraph(style= 'height: 180px;')
+
 			// raw log
 
 			div.row: div.col-sm-12
@@ -150,5 +159,11 @@ html
 
 			script(src = '/_npm/jquery/dist/jquery.min.js')
 			script(src = '/_npm/bootstrap/dist/js/bootstrap.min.js')
+			script(src = '/_npm/chart.js/dist/Chart.bundle.js')
 
 			script(src = '/global/bundle.js')
+
+			script.
+				window.Tracker = {};
+				window.Tracker.rolling1DayTotals = !{JSON.stringify(stats.rolling1DayTotals)};
+				window.Tracker.rolling7DayAverages = !{JSON.stringify(stats.rolling7DayAverages)};

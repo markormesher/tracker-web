@@ -1,6 +1,7 @@
 import _ = require("lodash");
 import Bluebird = require("bluebird");
 import RedisHelper = require('../helpers/redis');
+import * as moment from "moment";
 import {LogEntry, Period} from "../models/LogEntry";
 
 export class Stats {
@@ -9,7 +10,9 @@ export class Stats {
 	totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } };
 	percentageDurationPerActivity: { [key: string]: number };
 	countDays: number;
-	countDaysPerActivity: { [key: string]: number }
+	countDaysPerActivity: { [key: string]: number };
+	rolling1DayTotals: { [key: string]: { [key: string]: number } };
+	rolling7DayAverages: { [key: string]: { [key: string]: number } };
 }
 
 function computeTotalDuration(entries: LogEntry[]): number {
@@ -74,6 +77,47 @@ function computeCountDaysPerActivity(totalDurationPerActivityPerDay: { [key: str
 			.value();
 }
 
+function computeRollingAverage(activity: string, window: number, totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } }): { [key: string]: number } {
+
+	const totalDurationPerDay = totalDurationPerActivityPerDay[activity];
+	const firstDay = moment(_(totalDurationPerDay).keys().min());
+	const lastDay = moment(_(totalDurationPerDay).keys().max());
+
+	const output: { [key: string]: number } = {};
+
+	let currentDate = firstDay;
+	let windowValues: number[] = [];
+	let sumSoFar = 0;
+	while (currentDate.isSameOrBefore(lastDay)) {
+		if (windowValues.length == window) {
+			sumSoFar -= windowValues[0];
+			windowValues = windowValues.slice(1);
+		}
+
+		const dateStr = currentDate.format("YYYY-MM-DD");
+		const dayValue = totalDurationPerDay[dateStr] || 0;
+		sumSoFar += dayValue;
+		windowValues.push(dayValue);
+
+		output[dateStr] = sumSoFar / windowValues.length;
+
+		currentDate.add(1, 'day');
+	}
+
+	return output;
+}
+
+function computeRollingAverages(window: number, totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } }): { [key: string]: { [key: string]: number }} {
+	return _(totalDurationPerActivityPerDay)
+			.keys()
+			.map(key => {
+				const objFragment: { [key: string]: { [key: string]: number}} = {};
+				objFragment[key] = computeRollingAverage(key, window, totalDurationPerActivityPerDay);
+				return objFragment;
+			})
+			.reduce(_.merge);
+}
+
 function recomputeStats(): Bluebird<'OK'> {
 	return LogEntry
 			.findAll({order: [['startTime', 'ASC']]})
@@ -86,6 +130,8 @@ function recomputeStats(): Bluebird<'OK'> {
 				const percentageDurationPerActivity = computePercentageDurationPerActivity(totalDurationPerActivity, totalDuration);
 				const countDays = computeCountDays(totalDuration);
 				const countDaysPerActivity = computeCountDaysPerActivity(totalDurationPerActivityPerDay);
+				const rolling1DayTotals = computeRollingAverages(1, totalDurationPerActivityPerDay);
+				const rolling7DayAverages = computeRollingAverages(7, totalDurationPerActivityPerDay);
 
 				return {
 					totalDuration: totalDuration,
@@ -94,6 +140,8 @@ function recomputeStats(): Bluebird<'OK'> {
 					percentageDurationPerActivity: percentageDurationPerActivity,
 					countDays: countDays,
 					countDaysPerActivity: countDaysPerActivity,
+					rolling1DayTotals: rolling1DayTotals,
+					rolling7DayAverages: rolling7DayAverages,
 				} as Stats;
 			})
 			.then(results => {

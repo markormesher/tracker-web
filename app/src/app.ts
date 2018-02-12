@@ -39,6 +39,7 @@ app.use(Express.static(Path.join(__dirname, 'public')));
 app.use(Express.static(Path.join(__dirname, 'assets')));
 [
 	'bootstrap',
+	'chart.js',
 	'datatables.net',
 	'datatables.net-bs',
 	'font-awesome',

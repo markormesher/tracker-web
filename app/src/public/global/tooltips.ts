@@ -9,5 +9,5 @@ $(() => {
 			() => {
 				$('.block').removeClass('highlight');
 			}
-	)
+	);
 });
