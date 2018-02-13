@@ -5,6 +5,7 @@ import * as moment from "moment";
 import {LogEntry, Period} from "../models/LogEntry";
 
 export class Stats {
+	allDates: string[];
 	totalDuration: number;
 	totalDurationPerActivity: { [key: string]: number };
 	totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } };
@@ -13,6 +14,17 @@ export class Stats {
 	countDaysPerActivity: { [key: string]: number };
 	rolling1DayTotals: { [key: string]: { [key: string]: number } };
 	rolling7DayAverages: { [key: string]: { [key: string]: number } };
+	chequerboardArrays: { [key: string]: number[] };
+}
+
+function computeAllDates(entries: LogEntry[]): string[] {
+	return _(entries)
+			.map((e: LogEntry) => e.periods)
+			.flatten()
+			.map((p: Period) => [p.start.format("YYYY-MM-DD"), p.end.format("YYYY-MM-DD")])
+			.flatten()
+			.uniq()
+			.value();
 }
 
 function computeTotalDuration(entries: LogEntry[]): number {
@@ -26,10 +38,6 @@ function computeTotalDuration(entries: LogEntry[]): number {
 
 		return lastPeriod.end.valueOf() - firstPeriod.start.valueOf();
 	}
-}
-
-function computeCountDays(totalDuration: number) {
-	return Math.ceil(totalDuration / (24 * 60 * 60 * 1000));
 }
 
 function computeTotalDurationPerActivity(entries: LogEntry[]): { [key: string]: number } {
@@ -77,9 +85,8 @@ function computeCountDaysPerActivity(totalDurationPerActivityPerDay: { [key: str
 			.value();
 }
 
-function computeRollingAverage(activity: string, window: number, totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } }): { [key: string]: number } {
+function computeRollingAverage(window: number, totalDurationPerDay: { [key: string]: number }): { [key: string]: number } {
 
-	const totalDurationPerDay = totalDurationPerActivityPerDay[activity];
 	const firstDay = moment(_(totalDurationPerDay).keys().min());
 	const lastDay = moment(_(totalDurationPerDay).keys().max());
 
@@ -107,12 +114,56 @@ function computeRollingAverage(activity: string, window: number, totalDurationPe
 	return output;
 }
 
-function computeRollingAverages(window: number, totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } }): { [key: string]: { [key: string]: number }} {
+function computeRollingAverages(window: number, totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } }): { [key: string]: { [key: string]: number } } {
 	return _(totalDurationPerActivityPerDay)
 			.keys()
 			.map(key => {
-				const objFragment: { [key: string]: { [key: string]: number}} = {};
-				objFragment[key] = computeRollingAverage(key, window, totalDurationPerActivityPerDay);
+				const objFragment: { [key: string]: { [key: string]: number } } = {};
+				objFragment[key] = computeRollingAverage(window, totalDurationPerActivityPerDay[key]);
+				return objFragment;
+			})
+			.reduce(_.merge);
+}
+
+function computeChequerboardArray(allDates: string[], totalDurationPerDay: { [key: string]: number }): number[] {
+
+	const baseline = 0.2;
+	const maxValue = _(totalDurationPerDay).values().max();
+
+	const firstDay = moment(_(allDates).min());
+	const lastDay = moment(_(allDates).max());
+
+	const output: number[] = [];
+
+	// blank dots to get up to the right start DOW
+	const daysToSkip = firstDay.weekday() - 1;
+	for (let i = 0; i < daysToSkip; ++i) {
+		output.push(-1);
+	}
+
+	let currentDate = firstDay;
+	while (currentDate.isSameOrBefore(lastDay)) {
+		const dateStr = currentDate.format("YYYY-MM-DD");
+		const dayValue = totalDurationPerDay[dateStr] || 0;
+
+		if (dayValue == 0) {
+			output.push(0);
+		} else {
+			output.push(baseline + ((1.0 - baseline) * dayValue / maxValue));
+		}
+
+		currentDate.add(1, 'day');
+	}
+
+	return output;
+}
+
+function computeChequerboardArrays(allDates: string[], totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } }): { [key: string]: number[] } {
+	return _(totalDurationPerActivityPerDay)
+			.keys()
+			.map(key => {
+				const objFragment: { [key: string]: number[] } = {};
+				objFragment[key] = computeChequerboardArray(allDates, totalDurationPerActivityPerDay[key]);
 				return objFragment;
 			})
 			.reduce(_.merge);
@@ -124,24 +175,27 @@ function recomputeStats(): Bluebird<'OK'> {
 			.then(entries => {
 				entries.forEach(e => e.populatePeriods());
 
+				const allDates = computeAllDates(entries);
 				const totalDuration = computeTotalDuration(entries);
 				const totalDurationPerActivity = computeTotalDurationPerActivity(entries);
 				const totalDurationPerActivityPerDay = computeTotalDurationPerActivityPerDay(entries);
 				const percentageDurationPerActivity = computePercentageDurationPerActivity(totalDurationPerActivity, totalDuration);
-				const countDays = computeCountDays(totalDuration);
 				const countDaysPerActivity = computeCountDaysPerActivity(totalDurationPerActivityPerDay);
 				const rolling1DayTotals = computeRollingAverages(1, totalDurationPerActivityPerDay);
 				const rolling7DayAverages = computeRollingAverages(7, totalDurationPerActivityPerDay);
+				const chequerboardArrays = computeChequerboardArrays(allDates, totalDurationPerActivityPerDay);
 
 				return {
+					allDates: allDates,
 					totalDuration: totalDuration,
 					totalDurationPerActivity: totalDurationPerActivity,
 					totalDurationPerActivityPerDay: totalDurationPerActivityPerDay,
 					percentageDurationPerActivity: percentageDurationPerActivity,
-					countDays: countDays,
+					countDays: allDates.length,
 					countDaysPerActivity: countDaysPerActivity,
 					rolling1DayTotals: rolling1DayTotals,
 					rolling7DayAverages: rolling7DayAverages,
+					chequerboardArrays: chequerboardArrays
 				} as Stats;
 			})
 			.then(results => {
