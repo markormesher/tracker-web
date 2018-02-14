@@ -1,10 +1,14 @@
 -
+	const allDates = stats.allDates || [];
 	const totalDuration = stats.totalDuration || 0;
 	const totalDurationPerActivity = stats.totalDurationPerActivity || {};
 	const totalDurationPerActivityPerDay = stats.totalDurationPerActivityPerDay || {};
 	const percentageDurationPerActivity = stats.percentageDurationPerActivity || {};
 	const countDays = stats.countDays || 0;
 	const countDaysPerActivity = stats.countDaysPerActivity || {};
+	const rolling1DayTotals = stats.chequerboardArrays || {};
+	const rolling7DayAverages = stats.chequerboardArrays || {};
+	const chequerboardArrays = stats.chequerboardArrays || {};
 
 	function formatDuration(duration) {
 		duration = duration / 1000;
@@ -79,6 +83,8 @@ html
 
 			div.row: div.col-sm-12
 				h3 Summary
+
+			div.row: div.col-sm-12
 				div.block-container(style = 'height: 80px')
 					each block in percentageBlocks
 						- const title = block[0]
@@ -109,10 +115,40 @@ html
 				div.col-sm-12.col-md-6: canvas#sleepGraph(style= 'height: 180px;')
 				div.col-sm-12.col-md-6: canvas#workGraph(style= 'height: 180px;')
 
+			// workout chequerboard
+
+			div.row: div.col-sm-12
+				h3 Exercise Log
+
+			div.row: div.col-sm-12
+				div.chequerboard
+					- var i = 0
+					- const dayValues = chequerboardArrays['Exercise']
+					while i < dayValues.length
+						div.column
+							- const maxCell = Math.min(i + 7, dayValues.length)
+							while i < maxCell
+								- const score = dayValues[i][0]
+								if (score === -1)
+									div.cell(style= 'opacity: 0;')
+								else if (score === 0)
+									div.cell
+								else
+									- const duration = dayValues[i][1]
+									div.cell.colourise(
+										data-key= 'Exercise',
+										data-toggle = 'tooltip',
+										title = formatDuration(duration),
+										style= 'opacity: ' + score + ';'
+									)
+								- i += 1
+
 			// raw log
 
 			div.row: div.col-sm-12
 				h3 Raw Log
+
+			div.row: div.col-sm-12
 				div.block-container
 					- var rowSum = 0
 					- const maxRowSum = 24 * 60 * 60 * 1000

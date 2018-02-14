@@ -16,7 +16,7 @@ export class Stats {
 	countDaysPerActivity: { [key: string]: number };
 	rolling1DayTotals: { [key: string]: { [key: string]: number } };
 	rolling7DayAverages: { [key: string]: { [key: string]: number } };
-	chequerboardArrays: { [key: string]: number[] };
+	chequerboardArrays: { [key: string]: number[][] };
 }
 
 function computeAllDates(entries: LogEntry[]): string[] {
@@ -127,19 +127,20 @@ function computeRollingAverages(window: number, totalDurationPerActivityPerDay: 
 			.reduce(_.merge);
 }
 
-function computeChequerboardArray(allDates: string[], totalDurationPerDay: { [key: string]: number }): number[] {
+function computeChequerboardArray(allDates: string[], totalDurationPerDay: { [key: string]: number }): number[][] {
 
-	const baseline = 0.2;
+	const baseline = 0.33;
 	const maxValue = _(totalDurationPerDay).values().max();
+	const minValue = _(totalDurationPerDay).values().min();
 
 	const firstDay = moment(_(allDates).min());
 	const lastDay = moment(_(allDates).max());
 
-	const output: number[] = [];
+	const output: number[][] = [];
 
 	const daysToSkip = firstDay.weekday() - 1;
 	for (let i = 0; i < daysToSkip; ++i) {
-		output.push(-1);
+		output.push([-1]);
 	}
 
 	let currentDate = firstDay;
@@ -148,9 +149,10 @@ function computeChequerboardArray(allDates: string[], totalDurationPerDay: { [ke
 		const dayValue = totalDurationPerDay[dateStr] || 0;
 
 		if (dayValue == 0) {
-			output.push(0);
+			output.push([0]);
 		} else {
-			output.push(baseline + ((1.0 - baseline) * dayValue / maxValue));
+			const score = baseline + ((1.0 - baseline) * (dayValue - minValue) / (maxValue - minValue));
+			output.push([score, dayValue]);
 		}
 
 		currentDate.add(1, 'day');
@@ -159,11 +161,11 @@ function computeChequerboardArray(allDates: string[], totalDurationPerDay: { [ke
 	return output;
 }
 
-function computeChequerboardArrays(allDates: string[], totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } }): { [key: string]: number[] } {
+function computeChequerboardArrays(allDates: string[], totalDurationPerActivityPerDay: { [key: string]: { [key: string]: number } }): { [key: string]: number[][] } {
 	return _(totalDurationPerActivityPerDay)
 			.keys()
 			.map(key => {
-				const objFragment: { [key: string]: number[] } = {};
+				const objFragment: { [key: string]: number[][] } = {};
 				objFragment[key] = computeChequerboardArray(allDates, totalDurationPerActivityPerDay[key]);
 				return objFragment;
 			})

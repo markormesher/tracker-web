@@ -67,6 +67,21 @@ div.stat-card {
 	}
 }
 
+div.chequerboard {
+	div.column {
+		display: inline-block;
+		float: left;
+		width: 12px;
+		margin-right: 2px;
+
+		div.cell {
+			height: 12px;
+			background-color: #dddddd;
+			margin-bottom: 2px;
+		}
+	}
+}
+
 div.container {
 	padding-top: 20px;
 }
