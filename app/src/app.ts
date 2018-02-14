@@ -17,7 +17,7 @@ SequelizeDb.sync().then(() => {
 });
 
 // form body content
-app.use(BodyParser.raw());
+app.use(BodyParser.raw({limit: '50mb'}));
 
 // sass conversion
 app.use(NodeSassMiddleware({

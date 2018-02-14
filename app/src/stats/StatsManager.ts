@@ -4,6 +4,8 @@ import RedisHelper = require('../helpers/redis');
 import * as moment from "moment";
 import {LogEntry, Period} from "../models/LogEntry";
 
+const DATE_FORMAT = "YYYY-MM-DD";
+
 export class Stats {
 	allDates: string[];
 	totalDuration: number;
@@ -21,7 +23,7 @@ function computeAllDates(entries: LogEntry[]): string[] {
 	return _(entries)
 			.map((e: LogEntry) => e.periods)
 			.flatten()
-			.map((p: Period) => [p.start.format("YYYY-MM-DD"), p.end.format("YYYY-MM-DD")])
+			.map((p: Period) => [p.start.format(DATE_FORMAT), p.end.format(DATE_FORMAT)])
 			.flatten()
 			.uniq()
 			.value();
@@ -59,7 +61,7 @@ function computeTotalDurationPerActivityPerDay(entries: LogEntry[]): { [key: str
 				objFragment[entryKey] = _(groupedEntries)
 						.flatMap((e: LogEntry) => e.periods)
 						.flatten()
-						.groupBy((p: Period) => p.start.format("YYYY-MM-DD"))
+						.groupBy((p: Period) => p.start.format(DATE_FORMAT))
 						.map((groupedPeriods: Period[], periodKey: string) => {
 							const innerObjFragment: { [key: string]: number } = {};
 							innerObjFragment[periodKey] = _.sumBy(groupedPeriods, p => p.getDuration());
@@ -101,7 +103,7 @@ function computeRollingAverage(window: number, totalDurationPerDay: { [key: stri
 			windowValues = windowValues.slice(1);
 		}
 
-		const dateStr = currentDate.format("YYYY-MM-DD");
+		const dateStr = currentDate.format(DATE_FORMAT);
 		const dayValue = totalDurationPerDay[dateStr] || 0;
 		sumSoFar += dayValue;
 		windowValues.push(dayValue);
@@ -135,7 +137,6 @@ function computeChequerboardArray(allDates: string[], totalDurationPerDay: { [ke
 
 	const output: number[] = [];
 
-	// blank dots to get up to the right start DOW
 	const daysToSkip = firstDay.weekday() - 1;
 	for (let i = 0; i < daysToSkip; ++i) {
 		output.push(-1);
@@ -143,7 +144,7 @@ function computeChequerboardArray(allDates: string[], totalDurationPerDay: { [ke
 
 	let currentDate = firstDay;
 	while (currentDate.isSameOrBefore(lastDay)) {
-		const dateStr = currentDate.format("YYYY-MM-DD");
+		const dateStr = currentDate.format(DATE_FORMAT);
 		const dayValue = totalDurationPerDay[dateStr] || 0;
 
 		if (dayValue == 0) {
