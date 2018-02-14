@@ -1,0 +1,8 @@
+version: '3.3'
+
+services:
+  app:
+    environment:
+      - ENV=dev
+    volumes:
+      - ./app/src/views:/usr/src/app/dist/views
