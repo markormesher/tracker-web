@@ -46,7 +46,7 @@ html
 			div.row
 
 				- const sleepPerNight = formatDuration(totalDurationPerActivity['Sleeping'] / (countDays - 1))
-				- const workoutsPerWeek = round(countDaysPerActivity['Exercise'] / countDays * 7, 1)
+				- const workoutsPerWeek = round((countDaysPerActivity['Exercise'] + countDaysPerActivity['Light exercise']) / countDays * 7, 1)
 				- const workHoursPerWeek = formatDuration(totalDurationPerActivity['Work'] / countDays * 7)
 				- const projectHoursPerWeek = formatDuration(totalDurationPerActivity['Personal projects'] / countDays * 7)
 
@@ -123,24 +123,32 @@ html
 			div.row: div.col-sm-12
 				div.chequerboard
 					- var i = 0
-					- const dayValues = chequerboardArrays['Exercise']
-					while i < dayValues.length
+					- const exerciseValues = chequerboardArrays['Exercise']
+					- const lightExerciseValues = chequerboardArrays['Light exercise']
+					while i < exerciseValues.length
 						div.column
-							- const maxCell = Math.min(i + 7, dayValues.length)
+							- const maxCell = Math.min(i + 7, exerciseValues.length)
 							while i < maxCell
-								- const score = dayValues[i][0]
-								if (score === -1)
-									div.cell(style= 'opacity: 0;')
-								else if (score === 0)
-									div.cell
-								else
-									- const duration = dayValues[i][1]
+								- const exerciseValue = exerciseValues[i][0]
+								- const lightExerciseValue = lightExerciseValues[i][0]
+								if (exerciseValue > 0)
+									- const duration = exerciseValues[i][1]
 									div.cell.colourise(
 										data-key= 'Exercise',
 										data-toggle = 'tooltip',
 										title = formatDuration(duration),
-										style= 'opacity: ' + score + ';'
+										style= 'opacity: ' + exerciseValue + ';'
 									)
+								else if (lightExerciseValue > 0)
+									- const duration = lightExerciseValues[i][1]
+									div.cell.colourise(
+										data-key= 'Light exercise',
+										data-toggle = 'tooltip',
+										title = formatDuration(duration),
+										style= 'opacity: ' + lightExerciseValue + ';'
+									)
+								else
+									div.cell
 								- i += 1
 
 			// raw log

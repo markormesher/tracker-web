@@ -56,7 +56,8 @@ $(() => {
 					data: convertToData(window.Tracker.rolling1DayTotals['Sleeping']),
 					borderColor: 'rgba(3, 169, 244, 1.0)',
 					borderWidth: 2,
-					backgroundColor: 'transparent'
+					backgroundColor: 'transparent',
+					pointRadius: 0
 				} as ChartDataSets,
 				{
 					label: 'Sleep/day (7-day average)',
@@ -78,7 +79,8 @@ $(() => {
 					data: convertToData(window.Tracker.rolling1DayTotals['Work']),
 					borderColor: 'rgba(244, 67, 54, 1.0)',
 					borderWidth: 2,
-					backgroundColor: 'transparent'
+					backgroundColor: 'transparent',
+					pointRadius: 0
 				} as ChartDataSets,
 				{
 					label: 'Work/day (7-day average)',
