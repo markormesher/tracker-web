@@ -14,6 +14,7 @@ export class Stats {
 	percentageDurationPerActivity: { [key: string]: number };
 	countDays: number;
 	countDaysPerActivity: { [key: string]: number };
+	countPerActivity: { [key: string]: number };
 	rolling1DayTotals: { [key: string]: { [key: string]: number } };
 	rolling7DayAverages: { [key: string]: { [key: string]: number } };
 	chequerboardArrays: { [key: string]: number[][] };
@@ -84,6 +85,12 @@ function computeCountDaysPerActivity(totalDurationPerActivityPerDay: { [key: str
 			.mapValues((totalsPerDay: { [key: string]: number }) => {
 				return _.keys(totalsPerDay).length;
 			})
+			.value();
+}
+
+function computeCountPerActivity(entries: LogEntry[]): { [key: string]: number } {
+	return _(entries)
+			.countBy(e => e.title)
 			.value();
 }
 
@@ -184,6 +191,7 @@ function recomputeStats(): Bluebird<'OK'> {
 				const totalDurationPerActivityPerDay = computeTotalDurationPerActivityPerDay(entries);
 				const percentageDurationPerActivity = computePercentageDurationPerActivity(totalDurationPerActivity, totalDuration);
 				const countDaysPerActivity = computeCountDaysPerActivity(totalDurationPerActivityPerDay);
+				const countPerActivity = computeCountPerActivity(entries);
 				const rolling1DayTotals = computeRollingAverages(1, totalDurationPerActivityPerDay);
 				const rolling7DayAverages = computeRollingAverages(7, totalDurationPerActivityPerDay);
 				const chequerboardArrays = computeChequerboardArrays(allDates, totalDurationPerActivityPerDay);
@@ -195,6 +203,7 @@ function recomputeStats(): Bluebird<'OK'> {
 					totalDurationPerActivityPerDay: totalDurationPerActivityPerDay,
 					percentageDurationPerActivity: percentageDurationPerActivity,
 					countDays: allDates.length,
+					countPerActivity: countPerActivity,
 					countDaysPerActivity: countDaysPerActivity,
 					rolling1DayTotals: rolling1DayTotals,
 					rolling7DayAverages: rolling7DayAverages,
