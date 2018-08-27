@@ -1,6 +1,7 @@
 const allColours = [ // for reference
 	'#F44336',
 	'#9C27B0',
+	'#D67EE5',
 	'#3F51B5',
 	'#03A9F4',
 	'#009688',
@@ -19,6 +20,7 @@ const assignedColours: { [key: string]: string } = {
 	'Sleeping': '#03A9F4',
 
 	'Exercise': '#9C27B0',
+	'Light exercise': '#D67EE5',
 	'Personal development': '#8BC34A',
 	'Personal projects': '#009688',
 
