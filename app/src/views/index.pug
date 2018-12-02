@@ -46,7 +46,7 @@ html
 			div.row
 
 				- const sleepPerNight = formatDuration(totalDurationPerActivity['Sleeping'] / (countDays - 1))
-				- const workoutsPerWeek = round((countPerActivity['Exercise'] + countPerActivity['Light exercise']) / countDays * 7, 1)
+				- const workoutsPerWeek = round((countPerActivity['Exercise'] + countPerActivity['Light exercise']) / countDays * 7, 2)
 				- const workHoursPerWeek = formatDuration(totalDurationPerActivity['Work'] / countDays * 7)
 				- const projectHoursPerWeek = formatDuration(totalDurationPerActivity['Personal projects'] / countDays * 7)
 
