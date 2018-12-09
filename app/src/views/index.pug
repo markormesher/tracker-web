@@ -46,7 +46,7 @@ html
 			div.row
 
 				- const sleepPerNight = formatDuration(totalDurationPerActivity['Sleeping'] / (countDays - 1))
-				- const workoutsPerWeek = round((countPerActivity['Exercise'] + countPerActivity['Light exercise']) / countDays * 7, 2)
+				- const workoutsPerWeek = round((countPerActivity['Exercise'] + countPerActivity['Light exercise']) / countDays * 7, 3)
 				- const workHoursPerWeek = formatDuration(totalDurationPerActivity['Work'] / countDays * 7)
 				- const projectHoursPerWeek = formatDuration(totalDurationPerActivity['Personal projects'] / countDays * 7)
 
@@ -198,7 +198,7 @@ html
 			div.hr: hr
 
 			div.row: div.col-sm-12
-				p.text-muted.pull-left Last sync: #{lastSync}
+				p.text-muted.pull-left Last sync: #{lastSync} &nbsp;&bull;&nbsp; Days tracked: #{countDays}
 				p.text-muted.pull-right Data and design &copy; Mark Ormesher #{new Date().getFullYear()}
 
 			script(src = '/_npm/jquery/dist/jquery.min.js')
