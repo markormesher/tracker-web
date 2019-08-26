@@ -124,13 +124,11 @@ html
 				div.chequerboard
 					- var i = 0
 					- const exerciseValues = chequerboardArrays['Exercise']
-					- const lightExerciseValues = chequerboardArrays['Light exercise']
 					while i < exerciseValues.length
 						div.column
 							- const maxCell = Math.min(i + 7, exerciseValues.length)
 							while i < maxCell
 								- const exerciseValue = exerciseValues[i][0]
-								- const lightExerciseValue = lightExerciseValues[i][0]
 								if (exerciseValue > 0)
 									- const duration = exerciseValues[i][1]
 									div.cell.colourise(
@@ -138,14 +136,6 @@ html
 										data-toggle = 'tooltip',
 										title = formatDuration(duration),
 										style= 'opacity: ' + exerciseValue + ';'
-									)
-								else if (lightExerciseValue > 0)
-									- const duration = lightExerciseValues[i][1]
-									div.cell.colourise(
-										data-key= 'Light exercise',
-										data-toggle = 'tooltip',
-										title = formatDuration(duration),
-										style= 'opacity: ' + lightExerciseValue + ';'
 									)
 								else
 									div.cell

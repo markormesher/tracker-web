@@ -20,7 +20,6 @@ const assignedColours: { [key: string]: string } = {
 	'Sleeping': '#03A9F4',
 
 	'Exercise': '#9C27B0',
-	'Light exercise': '#D67EE5',
 	'Personal development': '#8BC34A',
 	'Personal projects': '#009688',
 
@@ -35,6 +34,7 @@ const spareColours = [
 	'#607D8B',
 	'#424242',
 	'#9E9E9E',
+	'#D67EE5',
 ];
 
 $(() => {
