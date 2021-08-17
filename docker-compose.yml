@@ -7,9 +7,6 @@ services:
       - postgres
       - redis
     restart: always
-    networks:
-      - traefik
-      - internal
     secrets:
       - api.key
       - postgres.password
@@ -19,17 +16,10 @@ services:
       - 3000
     command:
       - ./entry-point.sh
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik_default
-      - traefik.http.routers.tracker.rule=Host(`tracker.markormesher.co.uk`, `www.tracker.markormesher.co.uk`)
-      - traefik.http.routers.tracker.tls.certresolver=letsencrypt
 
   postgres:
     image: postgres:10.1-alpine
     restart: always
-    networks:
-      - traefik
     secrets:
       - postgres.password
     environment:
@@ -40,8 +30,6 @@ services:
   redis:
     image: redis:3.2-alpine
     restart: always
-    networks:
-      - internal
 
 volumes:
   postgres-data:
@@ -51,10 +39,3 @@ secrets:
     file: ./secrets/api.key
   postgres.password:
     file: ./secrets/postgres.password
-
-networks:
-  internal:
-    external: false
-  traefik:
-    external:
-      name: traefik_default
